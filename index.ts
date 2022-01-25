@@ -18,7 +18,7 @@ const sendEmail = (messages: any): Promise<any> => {
 
 const router = new Router();
 router
-  .get("/", async (context: RouterContext) => {
+  .post("/", async (context: RouterContext) => {
       const body = await context.request.body()
       const message = JSON.stringify(body)
       const response = await sendEmail([
