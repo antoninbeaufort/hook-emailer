@@ -1,5 +1,6 @@
 import { Application, Router, RouterContext } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
+import { encode } from "https://deno.land/std/encoding/base64.ts"
 const MAILJET_NEXT_API_URL = 'https://api.mailjet.com/v3.1'
 
 const headers = new Headers();
@@ -19,29 +20,36 @@ const sendEmail = (messages: any): Promise<any> => {
 const router = new Router();
 router
   .post("/", async (context: RouterContext) => {
-      const body = await context.request.body().value
-      const message = JSON.stringify(body)
-      const response = await sendEmail([
-        {
-            From: {
-                Email: 'test@thegreenalternative.fr',
-                Name: 'The Green Alternative - Test'
-            },
-            To: [
-                {
-                    Email: Deno.env.get('TO_EMAIL'),
-                    Name: 'Test',
-                },
-            ],
-            Subject: 'Hook received',
-            TextPart: message,
-            HTMLPart: message,
+    const body = await context.request.body().value
+    const message = JSON.stringify(body)
+    const response = await sendEmail([
+      {
+        From: {
+          Email: 'test@thegreenalternative.fr',
+          Name: 'The Green Alternative - Test'
         },
+        To: [
+          {
+            Email: Deno.env.get('TO_EMAIL'),
+            Name: 'Test',
+          },
+        ],
+        Subject: 'Hook received',
+        TextPart: '',
+        HTMLPart: '',
+        Attachments: [
+          {
+            ContentType: 'application/json',
+            Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
+            Content: encode(message),
+          }
+        ],
+      },
     ])
     context.response.status = 200
     context.response.headers.set("Content-Type", "application/json")
     context.response.body = {
-        success: response.ok
+      success: response.ok
     }
   });
 
@@ -51,6 +59,3 @@ app.use(router.routes());
 
 console.info("CORS-enabled web server listening on port 8000");
 await app.listen({ port: 8000 });
-
-
-
