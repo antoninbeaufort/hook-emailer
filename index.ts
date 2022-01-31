@@ -16,12 +16,24 @@ const sendEmail = (messages: any): Promise<any> => {
   });
 }
 
+const betterParseInt = (val: unknown) => {
+  if (typeof val === 'string') {
+    return parseInt(val.replace(/\D/g, ''), 10);
+  }
+  if (typeof val === 'number') {
+    return val;
+  }
+}
 const router = new Router();
 router
   .post("/", async (context: RouterContext) => {
     try {
       const body = await context.request.body().value
-      const message = JSON.stringify(body)
+      const entities = body.entities
+        .filter((entity: any) => entity.text)
+        .map((entity: any) => ({ [entity.name]: betterParseInt(entity.text) }))
+
+      const message = JSON.stringify(entities)
       let Filename = 'result.json'
       if (body.metadata && body.metadata.total_page && body.metadata.total_page.length && body.metadata.total_page.document_name) {
         Filename = body.metadata?.total_page[0]?.document_name?.replace('.pdf', '.json')
@@ -44,7 +56,7 @@ router
             {
               ContentType: 'application/json',
               Filename,
-              Base64Content: btoa(message),
+              Base64Content: btoa(unescape(encodeURIComponent(message))),
             }
           ],
         },
