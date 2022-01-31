@@ -50,7 +50,7 @@ router
       const jsonRes = await response.json()
       context.response.body = {
         success: response.ok,
-        jsonRes
+        ...(!response.ok && { jsonRes })
       }
     } catch (error) {
       context.response.status = 400
