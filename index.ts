@@ -1,6 +1,5 @@
 import { Application, Router, RouterContext } from "https://deno.land/x/oak/mod.ts";
 import { oakCors } from "https://deno.land/x/cors/mod.ts";
-import { encode } from "https://deno.land/std/encoding/base64.ts"
 const MAILJET_NEXT_API_URL = 'https://api.mailjet.com/v3.1'
 
 const headers = new Headers();
@@ -42,7 +41,7 @@ router
             {
               ContentType: 'application/json',
               Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
-              Content: encode(message),
+              Content: btoa(message),
             }
           ],
         },
