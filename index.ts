@@ -20,36 +20,46 @@ const sendEmail = (messages: any): Promise<any> => {
 const router = new Router();
 router
   .post("/", async (context: RouterContext) => {
-    const body = await context.request.body().value
-    const message = JSON.stringify(body)
-    const response = await sendEmail([
-      {
-        From: {
-          Email: 'test@thegreenalternative.fr',
-          Name: 'The Green Alternative - Test'
-        },
-        To: [
-          {
-            Email: Deno.env.get('TO_EMAIL'),
-            Name: 'Test',
+    try {
+      const body = await context.request.body().value
+      const message = JSON.stringify(body)
+      const response = await sendEmail([
+        {
+          From: {
+            Email: 'test@thegreenalternative.fr',
+            Name: 'The Green Alternative - Test'
           },
-        ],
-        Subject: 'Hook received',
-        TextPart: '',
-        HTMLPart: '',
-        Attachments: [
-          {
-            ContentType: 'application/json',
-            Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
-            Content: encode(message),
-          }
-        ],
-      },
-    ])
-    context.response.status = 200
-    context.response.headers.set("Content-Type", "application/json")
-    context.response.body = {
-      success: response.ok
+          To: [
+            {
+              Email: Deno.env.get('TO_EMAIL'),
+              Name: 'Test',
+            },
+          ],
+          Subject: 'Hook received',
+          TextPart: '',
+          HTMLPart: '',
+          Attachments: [
+            {
+              ContentType: 'application/json',
+              Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
+              Content: encode(message),
+            }
+          ],
+        },
+      ])
+      context.response.status = 200
+      context.response.headers.set("Content-Type", "application/json")
+      const jsonRes = await response.json()
+      context.response.body = {
+        success: response.ok,
+        jsonRes
+      }
+    } catch (error) {
+      context.response.status = 400
+      context.response.headers.set("Content-Type", "application/json")
+      context.response.body = {
+        error
+      }
     }
   });
 
