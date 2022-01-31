@@ -48,6 +48,9 @@ router
       context.response.status = 200
       context.response.headers.set("Content-Type", "application/json")
       const jsonRes = await response.json()
+      if (!response.ok) {
+        console.error(jsonRes)
+      }
       context.response.body = {
         success: response.ok,
         ...(!response.ok && { jsonRes })
