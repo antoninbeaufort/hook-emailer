@@ -22,6 +22,10 @@ router
     try {
       const body = await context.request.body().value
       const message = JSON.stringify(body)
+      let Filename = 'result.json'
+      if (body.metadata && body.metadata.total_page && body.metadata.total_page.length && body.metadata.total_page.document_name) {
+        Filename = body.metadata?.total_page[0]?.document_name?.replace('.pdf', '.json')
+      }
       const response = await sendEmail([
         {
           From: {
@@ -39,7 +43,7 @@ router
           Attachments: [
             {
               ContentType: 'application/json',
-              Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
+              Filename,
               Base64Content: btoa(message),
             }
           ],
@@ -56,6 +60,7 @@ router
         ...(!response.ok && { jsonRes })
       }
     } catch (error) {
+      console.error(error)
       context.response.status = 400
       context.response.headers.set("Content-Type", "application/json")
       context.response.body = {
