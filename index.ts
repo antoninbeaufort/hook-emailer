@@ -41,7 +41,7 @@ router
             {
               ContentType: 'application/json',
               Filename: body.metadata.total_page[0].document_name.replace('.pdf', '.json'),
-              Content: btoa(message),
+              Base64Content: btoa(message),
             }
           ],
         },
