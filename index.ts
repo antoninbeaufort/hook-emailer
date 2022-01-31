@@ -35,8 +35,7 @@ router
             },
           ],
           Subject: 'Hook received',
-          TextPart: '',
-          HTMLPart: '',
+          TextPart: 'JSON file attached with the hook data.',
           Attachments: [
             {
               ContentType: 'application/json',
