@@ -29,13 +29,13 @@ router
   .post("/", async (context: RouterContext) => {
     try {
       const body = await context.request.body().value
-      const entities = body['entities']
-        .filter((entity: any) => entity['text'] && entity['text'].length)
-        .map((entity: any) => ({ [entity['name']]: entity['text'].map(betterParseInt) }))
+      const entities = body.entities
+        .filter((entity: any) => entity.text && entity.text.length)
+        .map((entity: any) => ({ [entity.name]: entity.text.map(betterParseInt) }))
 
       const message = JSON.stringify(entities)
       let Filename = 'result.json'
-      if (body.metadata && body.metadata.total_page && body.metadata.total_page.length && body.metadata.total_page.document_name) {
+      if (body.metadata && body.metadata.total_page && body.metadata.total_page.length && body.metadata.total_page[0].document_name) {
         Filename = body.metadata?.total_page[0]?.document_name?.replace('.pdf', '.json')
       }
       const response = await sendEmail([
