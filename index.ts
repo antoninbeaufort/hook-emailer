@@ -29,9 +29,10 @@ router
   .post("/", async (context: RouterContext) => {
     try {
       const body = await context.request.body().value
+
       const entities = body.entities
-        .filter((entity: any) => entity.text && entity.text.length)
-        .map((entity: any) => ({ [entity.name]: entity.text.map(betterParseInt) }))
+        .filter((entity: any) => entity['text'] && entity['text'].length)
+        .map((entity: any) => ({ [entity['name']]: entity['text'].map(betterParseInt) }))
 
       const message = JSON.stringify(entities)
       let Filename = 'result.json'
