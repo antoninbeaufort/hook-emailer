@@ -31,7 +31,7 @@ router
       const body = await context.request.body().value
 
       const entities = body.entities
-        .filter((entity: any) => entity['text'] && entity['text'].length)
+        .filter((entity: any) => entity['text'] && Array.isArray(entity['text']) && entity['text'].length)
         .map((entity: any) => ({ [entity['name']]: entity['text'].map(betterParseInt) }))
 
       const message = JSON.stringify(entities)
