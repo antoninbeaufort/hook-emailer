@@ -80,9 +80,7 @@ router
         error
       }
     }
-  });
-
-router
+  })
   .post("/pure", async (context: RouterContext) => {
     try {
       const body = await context.request.body().value
