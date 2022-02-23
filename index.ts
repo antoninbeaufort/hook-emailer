@@ -82,6 +82,57 @@ router
     }
   });
 
+router
+  .post("/pure", async (context: RouterContext) => {
+    try {
+      const body = await context.request.body().value
+
+      const message = JSON.stringify(body)
+      const Filename = 'result.json'
+
+      const response = await sendEmail([
+        {
+          From: {
+            Email: 'test@thegreenalternative.fr',
+            Name: 'The Green Alternative - Test'
+          },
+          To: [
+            {
+              Email: Deno.env.get('TO_EMAIL'),
+              Name: 'Test',
+            },
+          ],
+          Subject: 'Hook received',
+          TextPart: 'JSON file attached with the hook data.',
+          Attachments: [
+            {
+              ContentType: 'application/json',
+              Filename,
+              Base64Content: btoa(unescape(encodeURIComponent(message))),
+            }
+          ],
+        },
+      ])
+      context.response.status = 200
+      context.response.headers.set("Content-Type", "application/json")
+      const jsonRes = await response.json()
+      if (!response.ok) {
+        console.error(jsonRes)
+      }
+      context.response.body = {
+        success: response.ok,
+        ...(!response.ok && { jsonRes })
+      }
+    } catch (error) {
+      console.error(error)
+      context.response.status = 400
+      context.response.headers.set("Content-Type", "application/json")
+      context.response.body = {
+        error
+      }
+    }
+  });
+
 const app = new Application();
 app.use(oakCors()); // Enable CORS for All Routes
 app.use(router.routes());
